@@ -1,0 +1,54 @@
+.product-list-container {
+    padding: 24px;
+}
+
+.product-filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    background-color: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.filter-select {
+    min-width: 150px;
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: white;
+}
+
+.stock-badge {
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.no-stock {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+.low-stock {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.in-stock {
+    background-color: #d1fae5;
+    color: #059669;
+}

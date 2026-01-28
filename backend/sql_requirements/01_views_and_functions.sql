@@ -27,3 +27,20 @@ LEFT JOIN inventory i ON p.id = i.product_id
 LEFT JOIN warehouses w ON i.warehouse_id = w.id
 GROUP BY p.id, p.name, p.sku, p.category
 HAVING COALESCE(SUM(i.quantity), 0) < 50;
+
+CREATE OR REPLACE VIEW v_OrderFulfillmentStatus AS
+SELECT 
+    o.id AS order_id,
+    c.company_name AS customer,
+    o.order_date,
+    o.status AS order_status,
+    COUNT(oi.id) AS unique_items_count,
+    o.total_amount,
+    o.payment_status,
+    s.status AS shipment_status,
+    s.expected_arrival
+FROM orders o
+JOIN customers c ON o.customer_id = c.id
+LEFT JOIN order_items oi ON o.id = oi.order_id
+LEFT JOIN shipments s ON o.id = s.order_id
+GROUP BY o.id, c.company_name, o.order_date, o.status, o.payment_status, o.total_amount, s.status, s.expected_arrival;

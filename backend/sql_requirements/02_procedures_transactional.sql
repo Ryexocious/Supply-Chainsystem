@@ -105,3 +105,58 @@ BEGIN
 
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE update_shipment_status(
+    p_shipment_id INT,
+    p_status VARCHAR,
+    p_user_id INT
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_vehicle_id INT;
+    v_order_id INT;
+    v_ordered_qty INT;
+    v_delivered_qty INT;
+BEGIN
+    -- Update Shipment and capture vehicle_id AND order_id
+    UPDATE shipments 
+    SET status = p_status, 
+        actual_arrival = (CASE WHEN TRIM(LOWER(p_status)) = 'delivered' THEN NOW() ELSE NULL END)
+    WHERE id = p_shipment_id
+    RETURNING vehicle_id, order_id INTO v_vehicle_id, v_order_id;
+
+    -- Audit Log
+    INSERT INTO audit_logs (table_name, action_type, record_id, changed_by, new_data)
+    VALUES ('shipments', 'UPDATE', p_shipment_id, p_user_id, jsonb_build_object('status', p_status));
+
+    -- Logic for 'delivered' status
+    IF TRIM(LOWER(p_status)) = 'delivered' THEN
+        -- Free up vehicle
+        IF v_vehicle_id IS NOT NULL THEN
+            UPDATE vehicles SET current_status = 'available' WHERE id = v_vehicle_id;
+        END IF;
+        
+        -- Sync Order Status (Check if ALL items are delivered)
+        IF v_order_id IS NOT NULL THEN
+            -- Calculate Total Ordered
+            SELECT SUM(quantity) INTO v_ordered_qty FROM order_items WHERE order_id = v_order_id;
+            
+            -- Calculate Total Delivered (including this one, which is already updated above)
+            SELECT COALESCE(SUM((elem->>'quantity')::int), 0) INTO v_delivered_qty
+            FROM shipments s, jsonb_array_elements(s.items) elem
+            WHERE s.order_id = v_order_id AND s.status = 'delivered';
+            
+            IF v_delivered_qty >= v_ordered_qty THEN
+                UPDATE orders 
+                SET status = 'delivered' 
+                WHERE id = v_order_id;
+            END IF;
+        ELSE
+            RAISE WARNING 'Shipment % has no associated Order ID', p_shipment_id;
+        END IF;
+    END IF;
+    
+    COMMIT;
+END;
+$$;

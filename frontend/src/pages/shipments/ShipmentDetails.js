@@ -10,19 +10,18 @@ const ShipmentDetails = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        const fetchShipment = async () => {
+            try {
+                const data = await shipmentsAPI.getShipmentById(id);
+                setShipment(data.shipment);
+            } catch (err) {
+                setError('Failed to fetch shipment details');
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchShipment();
     }, [id]);
-
-    const fetchShipment = async () => {
-        try {
-            const data = await shipmentsAPI.getShipmentById(id);
-            setShipment(data.shipment);
-        } catch (err) {
-            setError('Failed to fetch shipment details');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (loading) return <div className="page-container">Loading...</div>;
     if (error) return <div className="page-container"><div className="error-banner">{error}</div></div>;

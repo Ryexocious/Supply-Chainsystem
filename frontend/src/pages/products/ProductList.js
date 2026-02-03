@@ -121,13 +121,13 @@ const ProductList = () => {
                             <th>Price</th>
                             <th>Stock</th>
                             <th>Supplier</th>
-                            <th>Actions</th>
+
                         </tr>
                     </thead>
                     <tbody>
                         {products.length === 0 ? (
                             <tr>
-                                <td colSpan="7" className="text-center">No products found.</td>
+                                <td colSpan="6" className="text-center">No products found.</td>
                             </tr>
                         ) : (
                             products.map((product) => {
@@ -144,9 +144,7 @@ const ProductList = () => {
                                             </span>
                                         </td>
                                         <td>{product.supplier_names || '-'}</td>
-                                        <td>
-                                            <button className="btn-action">Edit</button>
-                                        </td>
+
                                     </tr>
                                 );
                             })

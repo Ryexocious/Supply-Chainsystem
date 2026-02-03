@@ -197,7 +197,7 @@ const ReceiveStock = () => {
                                 </option>
                             ))}
                         </select>
-                        {formData.supplierId && <small style={{ color: '#6b7280' }}>Showing products for selected supplier only. <a href="#" onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, supplierId: '' })); }}>Clear filter</a></small>}
+                        {formData.supplierId && <small style={{ color: '#6b7280' }}>Showing products for selected supplier only. <button className="btn-link" onClick={(e) => { e.preventDefault(); setFormData(prev => ({ ...prev, supplierId: '' })); }} style={{ background: 'none', border: 'none', padding: 0, color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>Clear filter</button></small>}
                     </div>
 
                     <div className="form-group">

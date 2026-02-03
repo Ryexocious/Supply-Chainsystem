@@ -63,7 +63,7 @@ FOR EACH ROW
 WHEN (OLD.price IS DISTINCT FROM NEW.price)
 EXECUTE FUNCTION log_sensitive_changes();
 
--- 3. Multi-row Trigger: Maintain Last Updated Timestamp (Moved from schema.sql)
+-- 3. Multi-row Trigger: Maintain Last Updated Timestamp
 CREATE OR REPLACE FUNCTION update_inventory_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN

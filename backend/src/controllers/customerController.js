@@ -87,3 +87,75 @@ exports.getCustomerById = async (req, res, next) => {
         next(error);
     }
 };
+exports.createCustomer = async (req, res, next) => {
+    try {
+        const { companyName, email, phone, billingAddress, region, creditLimit } = req.body;
+
+        if (!companyName) {
+            return res.status(400).json({ error: 'Company name is required' });
+        }
+
+        const result = await query(
+            `INSERT INTO customers (company_name, email, phone, billing_address, region, credit_limit)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+            [companyName, email, phone, billingAddress, region, creditLimit || 0]
+        );
+
+        res.status(201).json({
+            message: 'Customer created successfully',
+            customer: result.rows[0]
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.updateCustomer = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { companyName, email, phone, billingAddress, region, creditLimit } = req.body;
+
+        const checkResult = await query('SELECT * FROM customers WHERE id = $1', [id]);
+
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+
+        const result = await query(
+            `UPDATE customers 
+       SET company_name = COALESCE($1, company_name),
+           email = COALESCE($2, email),
+           phone = COALESCE($3, phone),
+           billing_address = COALESCE($4, billing_address),
+           region = COALESCE($5, region),
+           credit_limit = COALESCE($6, credit_limit)
+       WHERE id = $7 RETURNING *`,
+            [companyName, email, phone, billingAddress, region, creditLimit, id]
+        );
+
+        res.json({
+            message: 'Customer updated successfully',
+            customer: result.rows[0]
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.deleteCustomer = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const result = await query('DELETE FROM customers WHERE id = $1 RETURNING *', [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+
+        res.json({
+            message: 'Customer deleted successfully',
+            customer: result.rows[0]
+        });
+    } catch (error) {
+        next(error);
+    }
+};

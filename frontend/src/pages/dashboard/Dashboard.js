@@ -78,31 +78,46 @@ const Dashboard = () => {
         navigate('/login');
     };
 
-    const StatCard = ({ title, value, subtitle, color, icon, onClick }) => (
-        <div className="stat-card" style={{ borderLeftColor: color }} onClick={onClick}>
-            <div className="stat-icon" style={{ backgroundColor: `${color}20` }}>
+    const StatCard = ({ title, value, subtitle, color, onClick, onSubtitleClick }) => (
+        <div className="stat-card" style={{ background: color, cursor: onClick ? 'pointer' : 'default' }} onClick={onClick}>
+            {/* Icon removed as per request for no emojis */
+            /* <div className="stat-icon" style={{ backgroundColor: `${color}20` }}>
                 {icon}
-            </div>
+            </div> */}
             <div className="stat-content">
                 <h3 className="stat-value">{value}</h3>
                 <p className="stat-title">{title}</p>
-                {subtitle && <p className="stat-subtitle">{subtitle}</p>}
+                {subtitle && (
+                    <p
+                        className={`stat-subtitle ${onSubtitleClick ? 'stat-subtitle-action' : ''}`}
+                        onClick={(e) => {
+                            if (onSubtitleClick) {
+                                e.stopPropagation();
+                                onSubtitleClick();
+                            }
+                        }}
+                        style={onSubtitleClick ? { color: 'inherit' } : {}}
+                    >
+                        {subtitle}
+                    </p>
+                )}
             </div>
         </div>
     );
 
-    const QuickAction = ({ title, icon, color, onClick }) => (
-        <button className="quick-action" style={{ backgroundColor: color }} onClick={onClick}>
-            <span className="quick-action-icon">{icon}</span>
+    const QuickAction = ({ title, color, onClick }) => (
+        <button className="quick-action" style={{ background: color }} onClick={onClick}>
+            {/* <span className="quick-action-icon">{icon}</span> */}
             <span className="quick-action-text">{title}</span>
         </button>
     );
 
-    const ActivityItem = ({ icon, title, description, time, color }) => (
+    const ActivityItem = ({ title, description, time, color }) => (
         <div className="activity-item">
-            <div className="activity-icon" style={{ backgroundColor: `${color}20` }}>
+            <div className="activity-indicator" style={{ backgroundColor: color }}></div>
+            {/* <div className="activity-icon" style={{ backgroundColor: `${color}20` }}>
                 {icon}
-            </div>
+            </div> */}
             <div className="activity-content">
                 <h4 className="activity-title">{title}</h4>
                 <p className="activity-description">{description}</p>
@@ -116,7 +131,7 @@ const Dashboard = () => {
             {/* Header */}
             <header className="dashboard-header">
                 <div className="header-left">
-                    <h1 className="dashboard-title">📦 Warehouse Manager</h1>
+                    <h1 className="dashboard-title">Dashboard</h1>
                 </div>
                 <div className="header-right">
                     <div className="user-info">
@@ -131,11 +146,8 @@ const Dashboard = () => {
 
             {/* Main Content */}
             <main className="dashboard-main">
-                {/* Welcome Section */}
-                <div className="welcome-section">
-                    <h2>Good Morning, {user?.fullName?.split(' ')[0]}! 👋</h2>
-                    <p>Here's what's happening with your warehouse today</p>
-                </div>
+                {/* Welcome Section REMOVED */}
+
 
                 {/* Statistics Grid */}
                 <section className="stats-section">
@@ -145,32 +157,29 @@ const Dashboard = () => {
                             title="Total Orders"
                             value={stats.totalOrders}
                             subtitle={`${stats.pendingOrders} pending`}
-                            color="#3b82f6"
-                            icon="📦"
+                            color="linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
                             onClick={() => navigate('/orders')}
                         />
                         <StatCard
                             title="Products"
                             value={stats.totalProducts}
                             subtitle={`${stats.lowStockItems} low stock`}
-                            color="#f59e0b"
-                            icon="📊"
+                            color="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
                             onClick={() => navigate('/products')}
+                            onSubtitleClick={() => navigate('/inventory?lowStock=true')}
                         />
                         <StatCard
                             title="Active Shipments"
                             value={stats.activeShipments}
                             subtitle="In transit"
-                            color="#8b5cf6"
-                            icon="🚚"
+                            color="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
                             onClick={() => navigate('/shipments')}
                         />
                         <StatCard
                             title="Revenue"
                             value={`$${(stats.totalRevenue / 1000).toFixed(1)}K`}
                             subtitle="This month"
-                            color="#10b981"
-                            icon="💰"
+                            color="linear-gradient(135deg, #10b981 0%, #059669 100%)"
                         />
                     </div>
                 </section>
@@ -181,45 +190,38 @@ const Dashboard = () => {
                     <div className="actions-grid">
                         <QuickAction
                             title="New Order"
-                            icon="➕"
-                            color="#3b82f6"
+                            color="linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
                             onClick={() => navigate('/orders/new')}
                         />
                         <QuickAction
                             title="View Inventory"
-                            icon="📦"
-                            color="#8b5cf6"
+                            color="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
                             onClick={() => navigate('/inventory')}
                         />
                         <QuickAction
                             title="Customers"
-                            icon="👥"
-                            color="#10b981"
+                            color="linear-gradient(135deg, #10b981 0%, #059669 100%)"
                             onClick={() => navigate('/customers')}
                         />
 
                         <QuickAction
                             title="Suppliers"
-                            icon="🏭"
-                            color="#ef4444"
+                            color="linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
                             onClick={() => navigate('/suppliers')}
                         />
                         <QuickAction
                             title="Vehicles"
-                            icon="🚚"
-                            color="#3b82f6"
+                            color="linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)"
                             onClick={() => navigate('/vehicles')}
                         />
                         <QuickAction
                             title="Drivers"
-                            icon="🧑‍✈️"
-                            color="#f59e0b"
+                            color="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
                             onClick={() => navigate('/drivers')}
                         />
                         <QuickAction
                             title="Analytics"
-                            icon="📊"
-                            color="#8b5cf6"
+                            color="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
                             onClick={() => navigate('/analytics')}
                         />
                     </div>
@@ -235,7 +237,6 @@ const Dashboard = () => {
                             activities.map((activity, index) => (
                                 <ActivityItem
                                     key={`${activity.type}-${activity.id}-${index}`}
-                                    icon={activity.type === 'order' ? '📦' : '🚚'}
                                     title={activity.title}
                                     description={activity.description}
                                     time={new Date(activity.date).toLocaleString()}

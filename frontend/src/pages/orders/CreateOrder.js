@@ -70,11 +70,7 @@ const CreateOrder = () => {
         setSelectedProducts(newItems);
     };
 
-    const handleWarehouseChange = (index, warehouseId) => {
-        const newItems = [...selectedProducts];
-        newItems[index].warehouseId = warehouseId;
-        setSelectedProducts(newItems);
-    };
+
 
     const handleQuantityChange = (index, qty) => {
         const newItems = [...selectedProducts];

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { inventoryAPI } from '../../api/inventory';
 import '../orders/OrderList.css';
 
@@ -8,16 +8,19 @@ const InventoryList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         fetchInventory();
-    }, []);
+    }, [location.search]);
 
     const fetchInventory = async () => {
         setLoading(true);
         setError('');
         try {
-            const data = await inventoryAPI.getAllInventory();
+            const params = new URLSearchParams(location.search);
+            const lowStock = params.get('lowStock');
+            const data = await inventoryAPI.getAllInventory({ lowStock });
             setInventory(data.inventory);
         } catch (err) {
             setError(err.message || 'Failed to fetch inventory');

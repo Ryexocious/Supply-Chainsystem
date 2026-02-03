@@ -129,7 +129,7 @@ exports.getOrderById = async (req, res, next) => {
                 SUM((elem ->> 'quantity'):: int) as shipped_qty
                 FROM shipments s,
                 jsonb_array_elements(s.items) elem
-                WHERE s.order_id = $1
+                WHERE s.order_id = $1 AND s.status != 'cancelled'
                 GROUP BY s.order_id, elem ->> 'product_id'
             )
         SELECT

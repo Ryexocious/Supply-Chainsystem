@@ -9,11 +9,7 @@ const OrderDetails = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    useEffect(() => {
-        fetchOrder();
-    }, [id]);
-
-    const fetchOrder = async () => {
+    const fetchOrder = React.useCallback(async () => {
         try {
             const data = await ordersAPI.getOrderById(id);
             setOrder(data);
@@ -23,7 +19,11 @@ const OrderDetails = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
+
+    useEffect(() => {
+        fetchOrder();
+    }, [id, fetchOrder]);
 
     const getStatusColor = (status) => {
         const colors = {

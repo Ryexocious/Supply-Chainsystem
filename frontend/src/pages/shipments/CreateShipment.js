@@ -368,7 +368,7 @@ const CreateShipment = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Expected Arrival (Optional)</label>
+                            <label>Expected Arrival</label>
                             <input
                                 type="datetime-local"
                                 className="form-control"

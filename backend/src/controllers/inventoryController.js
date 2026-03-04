@@ -31,7 +31,11 @@ exports.getAllInventory = async (req, res, next) => {
         }
 
         if (lowStock === 'true') {
-            queryText += ` AND i.quantity <= 50`;
+            queryText += ` AND i.product_id IN (
+                SELECT inv.product_id FROM inventory inv
+                GROUP BY inv.product_id
+                HAVING COALESCE(SUM(inv.quantity), 0) < 50
+            )`;
         }
 
         queryText += ` ORDER BY i.quantity ASC`;

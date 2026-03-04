@@ -27,6 +27,11 @@ export const inventoryAPI = {
         });
         return response.data;
     },
+
+    predictRestockDate: async (productId) => {
+        const response = await apiClient.get(`/inventory/product/${productId}/predict-restock`);
+        return response.data;
+    }
 };
 
 export default inventoryAPI;

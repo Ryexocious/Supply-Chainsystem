@@ -13,9 +13,9 @@ const inventoryRoutes = require('./routes/inventory');
 const warehouseRoutes = require('./routes/warehouses');
 const shipmentRoutes = require('./routes/shipments');
 const vehicleRoutes = require('./routes/vehicles');
-//const driverRoutes = require('./routes/drivers');
+const driverRoutes = require('./routes/drivers');
 const activityRoutes = require('./routes/activity');
-//const analyticsRoutes = require('./routes/analyticsRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 const errorHandler = require('./middleware/errorHandler');
 
@@ -56,9 +56,9 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/warehouses', warehouseRoutes);
 app.use('/api/shipments', shipmentRoutes);
 app.use('/api/vehicles', vehicleRoutes);
-// app.use('/api/drivers', driverRoutes);
+app.use('/api/drivers', driverRoutes);
 app.use('/api/activity', activityRoutes);
-// app.use('/api/analytics', analyticsRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.use((req, res) => {
     res.status(404).json({ error: 'Route not found' });

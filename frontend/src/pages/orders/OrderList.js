@@ -29,6 +29,14 @@ const OrderList = () => {
         fetchOrders();
     }, [fetchOrders]);
 
+    const handleGenerateInvoices = async () => {
+        try {
+            await ordersAPI.generateMonthlyInvoices();
+        } catch (err) {
+            alert('Failed to generate invoices: ' + (err.message || 'Unknown error'));
+        }
+    };
+
     const getStatusColor = (status) => {
         const colors = {
             pending: '#f59e0b',
@@ -56,6 +64,9 @@ const OrderList = () => {
                     <p className="page-subtitle">Manage all your orders</p>
                 </div>
                 <div className="header-actions">
+                    <button className="btn-secondary" onClick={handleGenerateInvoices} style={{ marginRight: '10px' }}>
+                        Generate Invoices
+                    </button>
                     <button className="btn-primary" onClick={() => navigate('/orders/new')}>
                         + New Order
                     </button>
@@ -118,7 +129,7 @@ const OrderList = () => {
                                         <button className="btn-action" onClick={() => navigate(`/orders/${order.id}`)}>
                                             View
                                         </button>
-                                        {['pending', 'processing'].includes(order.status) && (
+                                        {!['delivered', 'cancelled'].includes(order.status) && (
                                             <button
                                                 className="btn-action"
                                                 style={{ backgroundColor: '#8b5cf6', color: 'white', border: 'none' }}

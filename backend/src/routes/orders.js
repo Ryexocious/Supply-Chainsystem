@@ -6,6 +6,7 @@ router.get('/', orderController.getAllOrders);
 router.get('/stats', orderController.getOrderStats);
 router.get('/:id', orderController.getOrderById);
 router.post('/', orderController.createOrder);
+router.post('/generate-invoices', orderController.generateMonthlyInvoices);
 router.put('/:id', orderController.updateOrder);
 router.delete('/:id', orderController.deleteOrder);
 

@@ -1,6 +1,7 @@
 const { query } = require('../config/database');
-
-exports.getAllOrders = async (req, res, next) => {
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path'); exports.getAllOrders = async (req, res, next) => {
     try {
         const { page = 1, limit = 10, status, customerId } = req.query;
         const offset = (page - 1) * limit;
@@ -291,6 +292,69 @@ exports.deleteOrder = async (req, res, next) => {
 
         res.json({ message: 'Order deleted successfully' });
     } catch (error) {
+        next(error);
+    }
+};
+
+exports.generateMonthlyInvoices = async (req, res, next) => {
+    try {
+        // Run the SQL procedure (which currently just logs to NOTICES)
+        // In a real system, this would populate an invoices table.
+        // For this demo, we will query the orders table directly to build the PDF.
+        await query('CALL generate_monthly_invoices()');
+
+        // Fetch the data that should be invoiced (shipped/delivered this month)
+        const invoiceDataResult = await query(`
+            SELECT 
+                c.company_name,
+                SUM(o.total_amount) as total_due
+            FROM orders o
+            JOIN customers c ON o.customer_id = c.id
+            WHERE o.order_date >= date_trunc('month', CURRENT_DATE)
+              AND o.status IN ('shipped', 'delivered')
+            GROUP BY c.id, c.company_name
+            HAVING SUM(o.total_amount) > 0;
+        `);
+
+        if (invoiceDataResult.rows.length === 0) {
+            return res.status(200).json({ message: 'No current orders needing invoices generated.' });
+        }
+
+        // Generate PDF
+        const doc = new PDFDocument();
+
+        // Build PDF Content
+        doc.fontSize(20).text('Monthly Invoices Report', { align: 'center' });
+        doc.moveDown();
+        doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`);
+        doc.moveDown(2);
+
+        doc.fontSize(14).text('Total Due by Customer:', { underline: true });
+        doc.moveDown();
+
+        let grandTotal = 0;
+        invoiceDataResult.rows.forEach(row => {
+            const amount = parseFloat(row.total_due);
+            grandTotal += amount;
+            doc.fontSize(12).text(`${row.company_name}: $${amount.toFixed(2)}`);
+            doc.moveDown(0.5);
+        });
+
+        doc.moveDown();
+        doc.fontSize(14).text(`Grand Total: $${grandTotal.toFixed(2)}`, { bold: true });
+
+        // Set headers for PDF download
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=Monthly_Invoices_${Date.now()}.pdf`);
+
+        // Pipe directly to the response
+        doc.pipe(res);
+        doc.end();
+
+    } catch (error) {
+        if (error.message.includes('No orders pending payment')) {
+            return res.status(200).json({ message: 'No current orders needing invoices generated.' });
+        }
         next(error);
     }
 };

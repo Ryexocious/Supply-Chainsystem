@@ -29,6 +29,15 @@ const InventoryList = () => {
         }
     };
 
+    const handlePredictRestock = async (productId) => {
+        try {
+            const data = await inventoryAPI.predictRestockDate(productId);
+            alert(`Predicted Restock Date: ${new Date(data.expected_restock_date).toLocaleDateString()}`);
+        } catch (err) {
+            alert('Failed to predict restock date: ' + (err.message || 'Unknown error'));
+        }
+    };
+
     const getStockColor = (level) => {
         const colors = {
             critical: '#ef4444',
@@ -111,12 +120,21 @@ const InventoryList = () => {
                                     {new Date(item.last_updated).toLocaleDateString()}
                                 </td>
                                 <td>
-                                    <button
-                                        className="btn-action"
-                                        onClick={() => navigate(`/inventory/edit/${item.id}`)}
-                                    >
-                                        Manage
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        <button
+                                            className="btn-action"
+                                            onClick={() => navigate(`/inventory/edit/${item.id}`)}
+                                        >
+                                            Manage
+                                        </button>
+                                        <button
+                                            className="btn-action"
+                                            style={{ backgroundColor: '#10b981', color: 'white', border: 'none' }}
+                                            onClick={() => handlePredictRestock(item.product_id)}
+                                        >
+                                            Predict Restock
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

@@ -9,9 +9,9 @@ exports.getAllInventory = async (req, res, next) => {
              p.name as product_name, p.sku, p.category,
              w.location_name as warehouse_name, w.max_capacity,
              CASE 
-               WHEN (i.quantity - i.reserved_quantity) <= 10 THEN 'critical'
-               WHEN (i.quantity - i.reserved_quantity) <= 50 THEN 'low'
-               WHEN (i.quantity - i.reserved_quantity) <= 100 THEN 'medium'
+               WHEN i.quantity < 20 THEN 'critical'
+               WHEN i.quantity < 50 THEN 'low'
+               WHEN i.quantity < 100 THEN 'medium'
                ELSE 'good'
              END as stock_level,
              (i.quantity - i.reserved_quantity) as available_quantity,
@@ -158,8 +158,8 @@ exports.getLowStockAlerts = async (req, res, next) => {
 
         const result = await query(
             `SELECT * FROM v_RestockAlert
-             WHERE quantity <= $1
-             ORDER BY quantity ASC`,
+             WHERE total_quantity <= $1
+             ORDER BY total_quantity ASC`,
             [threshold]
         );
 
@@ -190,6 +190,22 @@ exports.getInventoryByProduct = async (req, res, next) => {
         res.json({
             productId: parseInt(productId),
             stock: result.rows
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getRestockPrediction = async (req, res, next) => {
+    try {
+        const { productId } = req.params;
+        const result = await query(
+            'SELECT predict_restock_date($1) as expected_restock_date',
+            [productId]
+        );
+        res.json({
+            product_id: parseInt(productId),
+            expected_restock_date: result.rows[0].expected_restock_date
         });
     } catch (error) {
         next(error);

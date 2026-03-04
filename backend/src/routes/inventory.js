@@ -9,6 +9,7 @@ router.get('/', inventoryController.getAllInventory);
 router.get('/product/:productId', inventoryController.getInventoryByProduct);
 router.get('/alerts/low-stock', inventoryController.getLowStockAlerts);
 router.get('/:id', inventoryController.getInventoryById);
+router.get('/product/:productId/predict-restock', inventoryController.getRestockPrediction);
 router.post('/', inventoryController.addInventory);
 router.put('/:id', inventoryController.updateInventory);
 

@@ -128,7 +128,14 @@ const CreateShipment = () => {
                 const ordersRes = await ordersAPI.getAllOrders({ limit: 100, status: 'pending' });
                 // Also fetch processing
                 const processingRes = await ordersAPI.getAllOrders({ limit: 100, status: 'processing' });
-                const combinedOrders = [...(ordersRes.orders || []), ...(processingRes.orders || [])];
+                // Also fetch shipped (might be partially shipped but marked as shipped if all items were shipped but not delivered, or maybe we want them selectable anyway)
+                const shippedRes = await ordersAPI.getAllOrders({ limit: 100, status: 'shipped' });
+
+                const combinedOrders = [
+                    ...(ordersRes.orders || []),
+                    ...(processingRes.orders || []),
+                    ...(shippedRes.orders || [])
+                ];
 
                 // Remove duplicates if any
                 const uniqueOrders = Array.from(new Map(combinedOrders.map(item => [item.id, item])).values());
